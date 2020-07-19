@@ -10,7 +10,7 @@ const STOP_BADGE_COLOR = "#dc3545";
 const SUCCESS_BADGE_COLOR = "#17A2B8";
 
 // Listen for messages from popup
-chrome.runtime.onConnect.addListener(
+browser.runtime.onConnect.addListener(
   function(port) {
     if (port.name !== "p2b") {
       console.log("Port is not p2b: " + port.name);
@@ -30,9 +30,9 @@ chrome.runtime.onConnect.addListener(
 );
 
 // Listen for window to close
-chrome.windows.onRemoved.addListener(
+browser.windows.onRemoved.addListener(
   function (windowId) {
-    chrome.storage.sync.get(
+    browser.storage.local.get(
       [
         "windowId"
       ],
@@ -49,17 +49,17 @@ chrome.windows.onRemoved.addListener(
 function goToSkribblioHomePageAsync(tabId) {
   return new Promise(
     resolve => {
-      chrome.tabs.update(
+      browser.tabs.update(
         tabId,
         {
           url: SKRIBBLIO_URL,
           active: false
         },
         async tab => {
-          chrome.tabs.onUpdated.addListener(
+          browser.tabs.onUpdated.addListener(
             function listener(tabId, info) {
               if (info.status === 'complete' && tabId === tab.id) {
-                chrome.tabs.onUpdated.removeListener(listener);
+                browser.tabs.onUpdated.removeListener(listener);
                 resolve(tab);
               } else {
                 console.log(`Not ready | info.status: ${info.status} , Target Tab: ${tabId} , Current Tab: ${tab.id}`);
@@ -79,14 +79,14 @@ function joinNewGame(tabId) {
       console.log("Awaiting skribbl.io home page load");
       let tab = await goToSkribblioHomePageAsync(tabId);
 
-      chrome.storage.sync.get(
+      browser.storage.local.get(
         [
           "state"
         ],
         function(response) {
           if (response.state === "search") {
             console.log("Sending message to join new game");
-            chrome.tabs.sendMessage(
+            browser.tabs.sendMessage(
               tabId,
               {
                 tabId: tabId,
@@ -108,7 +108,7 @@ function respondToContent(response) {
   updateStorage();
 
   if (response === undefined) {
-    let lastError = chrome.runtime.lastError.message;
+    let lastError = browser.runtime.lastError.message;
     console.log(`Response was undefined, last error: ${lastError}`);
   } else {
     console.log("Searching players for friends");
@@ -119,7 +119,7 @@ function respondToContent(response) {
     if (playersArray.length > 1) {
       updatePlayersFound(playersArray, tabId);
 
-      chrome.storage.sync.get(
+      browser.storage.local.get(
         [
           "friends",
           "state"
@@ -151,7 +151,7 @@ function respondToContent(response) {
 
 function stopSearch() {
   updatePopupAndBadge("stop");
-  chrome.storage.sync.get(
+  browser.storage.local.get(
     [
       "startTime",
       "state"
@@ -172,7 +172,7 @@ function stopSearch() {
         } else {
           console.log("Not updating endTime and runTime due to previous pause state");
         }
-        chrome.storage.sync.set(storageUpdate);
+        browser.storage.local.set(storageUpdate);
       }
     }
   );
@@ -180,7 +180,7 @@ function stopSearch() {
 
 // Updates values in storage
 function updateStorage() {
-  chrome.storage.sync.get(
+  browser.storage.local.get(
     [
       "gamesJoined",
       "startTime",
@@ -190,7 +190,7 @@ function updateStorage() {
     function(response) {
       console.dir(response);
       let newGamesJoined = response.gamesJoined + 1;
-      chrome.browserAction.setBadgeText(
+      browser.browserAction.setBadgeText(
         {
           text: newGamesJoined.toString()
         }
@@ -204,7 +204,7 @@ function updateStorage() {
         newTotalGamesJoined += response.totalGamesJoined;
       }
 
-      chrome.storage.sync.set(
+      browser.storage.local.set(
         {
           "gamesJoined": newGamesJoined,
           "totalGamesJoined": newTotalGamesJoined,
@@ -217,7 +217,7 @@ function updateStorage() {
 
 // Updates the values in storage related to players found or seen
 function updatePlayersFound(playersArray, tabId) {
-  chrome.storage.sync.get(
+  browser.storage.local.get(
     [
       "playersFound",
       "totalPlayersSeen"
@@ -243,7 +243,7 @@ function updatePlayersFound(playersArray, tabId) {
         newTotalPlayersSeen += response.totalPlayersSeen;
       }
 
-      chrome.storage.sync.set(
+      browser.storage.local.set(
         {
           "playersFound": totalPlayersFound,
           "totalPlayersSeen": newTotalPlayersSeen
@@ -256,14 +256,14 @@ function updatePlayersFound(playersArray, tabId) {
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray, tabId) {
   console.log("Found friend");
-  chrome.storage.sync.set(
+  browser.storage.local.set(
     {
       "state": "stop"
     },
     function() {
       updatePopupAndBadge("success");
 
-      chrome.storage.sync.get(
+      browser.storage.local.get(
         [
           "startTime",
           "runTime",
@@ -285,7 +285,7 @@ function foundFriend(friendsArray, tabId) {
             newTotalRunTime += response.totalRunTime;
           }
 
-          chrome.storage.sync.set(
+          browser.storage.local.set(
             {
               "friendsFound": friendsArray,
               "runTime": finalRunTime,
@@ -295,7 +295,7 @@ function foundFriend(friendsArray, tabId) {
             }
           );
 
-          chrome.windows.update(
+          browser.windows.update(
             response.windowId,
             {
               drawAttention: true
@@ -314,12 +314,12 @@ function updatePopupAndBadge(state) {
   console.log(`Making popup & badge updates for: ${state}`)
   switch(state) {
     case "stop":
-      chrome.browserAction.setBadgeBackgroundColor(
+      browser.browserAction.setBadgeBackgroundColor(
         {
           color: STOP_BADGE_COLOR
         }
       );
-      chrome.browserAction.setBadgeText(
+      browser.browserAction.setBadgeText(
         {
           text: ""
         }
@@ -327,12 +327,12 @@ function updatePopupAndBadge(state) {
       popupFile = "html/default.html";
       break;
     case "success":
-      chrome.browserAction.setBadgeText(
+      browser.browserAction.setBadgeText(
         {
           text: SUCCESS_BADGE_TEXT
         }
       );
-      chrome.browserAction.setBadgeBackgroundColor(
+      browser.browserAction.setBadgeBackgroundColor(
         {
           color: SUCCESS_BADGE_COLOR
         }
@@ -341,7 +341,7 @@ function updatePopupAndBadge(state) {
       break;
   }
   if (popupFile !== "") {
-    chrome.browserAction.setPopup(
+    browser.browserAction.setPopup(
       {
         popup: popupFile
       }

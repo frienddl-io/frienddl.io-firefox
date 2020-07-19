@@ -1,7 +1,7 @@
 console.log("frienddl.io content script loaded");
 
 // Listen for messages from background
-chrome.runtime.onMessage.addListener(receiveRequest);
+browser.runtime.onMessage.addListener(receiveRequest);
 
 function checkDisconnected() {
   let disconnectButton = $("#modalDisconnect button:contains('Ok')");
@@ -19,7 +19,7 @@ function receiveRequest(request, sender, sendResponse) {
   console.log("Request received");
   console.dir(request);
 
-  chrome.storage.sync.get(
+  browser.storage.local.get(
     [
       "state"
     ],
