@@ -93,7 +93,7 @@ function updatePopupAndBadge(state) {
           color: SEARCH_BADGE_COLOR
         }
       );
-      popupFile = "html/search.html";
+      popupFile = "../html/search.html";
       break;
     case "pause":
       browser.browserAction.setBadgeBackgroundColor(
@@ -101,7 +101,7 @@ function updatePopupAndBadge(state) {
           color: PAUSE_BADGE_COLOR
         }
       );
-      popupFile = "html/pause.html";
+      popupFile = "../html/pause.html";
       break;
     case "stop":
       browser.browserAction.setBadgeText(
@@ -114,7 +114,7 @@ function updatePopupAndBadge(state) {
           color: STOP_BADGE_COLOR
         }
       );
-      popupFile = "html/default.html";
+      popupFile = "../html/default.html";
       break;
     case "success":
       browser.browserAction.setBadgeText(
@@ -127,7 +127,7 @@ function updatePopupAndBadge(state) {
           color: SUCCESS_BADGE_COLOR
         }
       );
-      popupFile = "html/success.html";
+      popupFile = "../html/success.html";
       break;
   }
   if (popupFile !== "") {

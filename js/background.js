@@ -9,12 +9,12 @@ const SUCCESS_BADGE_TEXT = "!";
 const STOP_BADGE_COLOR = "#dc3545";
 const SUCCESS_BADGE_COLOR = "#17A2B8";
 
+let CONTENT_PORTS = [];
+
 // Listen for messages from popup
 browser.runtime.onConnect.addListener(
   function(port) {
-    if (port.name !== "p2b") {
-      console.log("Port is not p2b: " + port.name);
-    } else {
+    if (port.name === "p2b") {
       console.log("Connected to p2b");
       port.onMessage.addListener(
         function(message) {
@@ -25,6 +25,11 @@ browser.runtime.onConnect.addListener(
           }
         }
       );
+    } if (port.name === "c2b") {
+      let tabId = port.sender.tab.id;
+      CONTENT_PORTS.push(tabId);
+    } else {
+      console.log("Port is not recognized: " + port.name);
     }
   }
 );
@@ -58,8 +63,9 @@ function goToSkribblioHomePageAsync(tabId) {
         async tab => {
           browser.tabs.onUpdated.addListener(
             function listener(tabId, info) {
-              if (info.status === 'complete' && tabId === tab.id) {
+              if (info.status === "complete" && tabId === tab.id) {
                 browser.tabs.onUpdated.removeListener(listener);
+                console.log("Ready");
                 resolve(tab);
               } else {
                 console.log(`Not ready | info.status: ${info.status} , Target Tab: ${tabId} , Current Tab: ${tab.id}`);
@@ -79,23 +85,38 @@ function joinNewGame(tabId) {
       console.log("Awaiting skribbl.io home page load");
       let tab = await goToSkribblioHomePageAsync(tabId);
 
-      browser.storage.local.get(
-        [
-          "state"
-        ],
-        function(response) {
-          if (response.state === "search") {
-            console.log("Sending message to join new game");
-            browser.tabs.sendMessage(
-              tabId,
-              {
-                tabId: tabId,
-                task: "retrieveContent"
-              },
-              respondToContent
+      console.log("Waiting for content script to load");
+      var checkIfContentScriptIsLoaded = setInterval(
+        function() {
+          if (CONTENT_PORTS.includes(tabId)) {
+            console.log("Loaded");
+
+            browser.storage.local.get(
+              [
+                "state"
+              ],
+              function(response) {
+                if (response.state === "search") {
+                  console.log("Sending message to join new game");
+                  browser.tabs.sendMessage(
+                    tabId,
+                    {
+                      tabId: tabId,
+                      task: "retrieveContent"
+                    },
+                    respondToContent
+                  );
+                }
+              }
             );
+            clearInterval(checkIfContentScriptIsLoaded);
+          } else {
+            console.log("Content script isn't loaded");
+            console.dir(CONTENT_PORTS);
+            console.log(CONTENT_PORTS.includes(tabId));
           }
-        }
+        },
+        100
       );
     }
   )();
@@ -324,7 +345,7 @@ function updatePopupAndBadge(state) {
           text: ""
         }
       );
-      popupFile = "html/default.html";
+      popupFile = "../html/default.html";
       break;
     case "success":
       browser.browserAction.setBadgeText(
@@ -337,7 +358,7 @@ function updatePopupAndBadge(state) {
           color: SUCCESS_BADGE_COLOR
         }
       );
-      popupFile = "html/success.html";
+      popupFile = "../html/success.html";
       break;
   }
   if (popupFile !== "") {

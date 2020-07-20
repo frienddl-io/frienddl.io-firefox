@@ -1,7 +1,11 @@
 console.log("frienddl.io content script loaded");
 
-// Listen for messages from background
-browser.runtime.onMessage.addListener(receiveRequest);
+console.log("Setting up port");
+let c2b = browser.runtime.connect(
+  {
+    name: "c2b"
+  }
+);
 
 function checkDisconnected() {
   let disconnectButton = $("#modalDisconnect button:contains('Ok')");
@@ -14,6 +18,13 @@ function checkDisconnected() {
     return false;
   }
 }
+
+// console.log("Sending message");
+// browser.runtime.sendMessage(
+//   {
+//     "ready": true
+//   }
+// );
 
 function receiveRequest(request, sender, sendResponse) {
   console.log("Request received");
@@ -88,3 +99,6 @@ function receiveRequest(request, sender, sendResponse) {
 
   return true;
 }
+
+// Listen for messages from background
+browser.runtime.onMessage.addListener(receiveRequest);
