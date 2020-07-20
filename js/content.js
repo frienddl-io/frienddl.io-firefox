@@ -1,7 +1,7 @@
 console.log("frienddl.io content script loaded");
 
 console.log("Setting up port");
-let c2b = browser.runtime.connect(
+let backgroundPort = browser.runtime.connect(
   {
     name: "c2b"
   }
@@ -18,13 +18,6 @@ function checkDisconnected() {
     return false;
   }
 }
-
-// console.log("Sending message");
-// browser.runtime.sendMessage(
-//   {
-//     "ready": true
-//   }
-// );
 
 function receiveRequest(request, sender, sendResponse) {
   console.log("Request received");
