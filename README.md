@@ -2,11 +2,14 @@
   <img id="logo" src="img/logo.png" class="center" alt="frienddl.io" title="frienddl.io" />
 </p>
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/blakegearin/frienddlio/blob/main/LICENSE.md)
+[![](https://img.shields.io/amo/v/frienddlio?color=6778C6)](https://github.com/frienddl-io/frienddl.io-firefox/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/frienddl-io/frienddl.io-firefox/blob/main/LICENSE.md)
 
 frienddl.io is a browser extension to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
 
-**Status:** Unpublished for Firefox, published for Chrome [here](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm)
+Download it now on [Chrome](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/frienddlio/)
+
+This is the codebase for the Mozilla Firefox version, but the goal is for all versions to have nearly identical code and feature parity.
 
 ## Features
 
