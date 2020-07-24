@@ -65,7 +65,6 @@ function goToSkribblioHomePageAsync(tabId) {
             function listener(tabId, info) {
               if (info.status === "complete" && tabId === tab.id) {
                 browser.tabs.onUpdated.removeListener(listener);
-                console.log("Ready");
                 resolve(tab);
               } else {
                 console.log(`Not ready | info.status: ${info.status} , Target Tab: ${tabId} , Current Tab: ${tab.id}`);
@@ -106,6 +105,8 @@ function joinNewGame(tabId) {
                     },
                     respondToContent
                   );
+                } else {
+                  console.log(`State is not search: ${response.state}`);
                 }
               }
             );
@@ -171,7 +172,7 @@ function respondToContent(response) {
 }
 
 function stopSearch() {
-  updatePopupAndBadge("stop");
+  updateBadge("stop");
   browser.storage.local.get(
     [
       "startTime",
@@ -282,7 +283,7 @@ function foundFriend(friendsArray, tabId) {
       "state": "stop"
     },
     function() {
-      updatePopupAndBadge("success");
+      updateBadge("success");
 
       browser.storage.local.get(
         [
@@ -328,11 +329,9 @@ function foundFriend(friendsArray, tabId) {
   );
 }
 
-// Updates the popup to a predefined HTML file
-function updatePopupAndBadge(state) {
-  let popupFile = "";
-
-  console.log(`Making popup & badge updates for: ${state}`)
+// Updates badge to reflect the state
+function updateBadge(state) {
+  console.log(`Making badge updates for: ${state}`)
   switch(state) {
     case "stop":
       browser.browserAction.setBadgeBackgroundColor(
@@ -340,12 +339,6 @@ function updatePopupAndBadge(state) {
           color: STOP_BADGE_COLOR
         }
       );
-      browser.browserAction.setBadgeText(
-        {
-          text: ""
-        }
-      );
-      popupFile = "../html/default.html";
       break;
     case "success":
       browser.browserAction.setBadgeText(
@@ -358,17 +351,9 @@ function updatePopupAndBadge(state) {
           color: SUCCESS_BADGE_COLOR
         }
       );
-      popupFile = "../html/success.html";
       break;
-  }
-  if (popupFile !== "") {
-    browser.browserAction.setPopup(
-      {
-        popup: popupFile
-      }
-    );
-  } else {
-    console.error(`State to update popup invalid: ${state}`);
+    default:
+      console.error(`State to update invalid: ${state}`);
   }
 }
 
