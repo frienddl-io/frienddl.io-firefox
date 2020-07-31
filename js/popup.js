@@ -31,11 +31,6 @@ $("#duplicate-error").text(browser.i18n.getMessage("duplicateError"));
 $("#friend-error").text(browser.i18n.getMessage("friendError"));
 $("#pause-instruction").text(browser.i18n.getMessage("pauseInstruction"));
 
-$("#start-button").text(browser.i18n.getMessage("startButton"));
-$("#resume-button").text(browser.i18n.getMessage("resumeButton"));
-$("#pause-button").text(browser.i18n.getMessage("pauseButton"));
-$("#stop-button").text(browser.i18n.getMessage("stopButton"));
-
 $("#spinner-icon").attr("alt", browser.i18n.getMessage("altSpinner"));
 $("#spinner-text").text(browser.i18n.getMessage("searchText"));
 $("#games-joined th").text(browser.i18n.getMessage("gamesJoined"));
