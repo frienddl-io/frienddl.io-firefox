@@ -3,9 +3,9 @@ console.log('frienddl.io popup script loaded');
 // Hide elements based on the state
 browser.storage.local.get(
   [
-    'state',
+    'state'
   ],
-  (response) => {
+  function (response) {
     let state;
     if (response.state === undefined) {
       state = 'stop';
@@ -18,7 +18,7 @@ browser.storage.local.get(
     if (state === 'stop') {
       $('#stats').hide();
     }
-  },
+  }
 );
 
 // Load translations
@@ -87,42 +87,42 @@ function updatePopupAndBadge(state) {
     case 'search':
       browser.browserAction.setBadgeBackgroundColor(
         {
-          color: SEARCH_BADGE_COLOR,
-        },
+          color: SEARCH_BADGE_COLOR
+        }
       );
       found = true;
       break;
     case 'pause':
       browser.browserAction.setBadgeBackgroundColor(
         {
-          color: PAUSE_BADGE_COLOR,
-        },
+          color: PAUSE_BADGE_COLOR
+        }
       );
       found = true;
       break;
     case 'stop':
       browser.browserAction.setBadgeText(
         {
-          text: '',
-        },
+          text: ''
+        }
       );
       browser.browserAction.setBadgeBackgroundColor(
         {
-          color: STOP_BADGE_COLOR,
-        },
+          color: STOP_BADGE_COLOR
+        }
       );
       found = true;
       break;
     case 'success':
       browser.browserAction.setBadgeText(
         {
-          text: SUCCESS_BADGE_TEXT,
-        },
+          text: SUCCESS_BADGE_TEXT
+        }
       );
       browser.browserAction.setBadgeBackgroundColor(
         {
-          color: SUCCESS_BADGE_COLOR,
-        },
+          color: SUCCESS_BADGE_COLOR
+        }
       );
       found = true;
       break;
@@ -136,14 +136,14 @@ function updatePopupAndBadge(state) {
       'search',
       'pause',
       'stop',
-      'success',
+      'success'
     ];
 
     const index = states.indexOf(state);
     states.splice(index, 1);
 
     const statesAsClasses = states.map(
-      (element) => `.${element}-hidden`,
+      (element) => `.${element}-hidden`
     ).join(', ');
 
     console.log(`Remove hidden elements for other states: ${statesAsClasses}`);
@@ -169,11 +169,11 @@ function foundFriend(friendsArray) {
 
   browser.storage.local.get(
     [
-      'runTime',
+      'runTime'
     ],
-    (response) => {
+    function (response) {
       $('#run-time td').text(msToTime(response.runTime));
-    },
+    }
   );
 }
 
@@ -185,9 +185,9 @@ function searchIsStopped() {
 
 // Listen for changes to storage
 browser.storage.onChanged.addListener(
-  (changes) => {
+  function (changes) {
     Object.keys(changes).forEach(
-      (key) => {
+      function (key) {
         const storageChange = changes[key];
         switch (key) {
           case 'state':
@@ -215,9 +215,9 @@ browser.storage.onChanged.addListener(
             console.log(`Key not found ${key}`);
             break;
         }
-      },
+      }
     );
-  },
+  }
 );
 
 // For debugging
@@ -230,7 +230,7 @@ browser.storage.onChanged.addListener(
 //   }
 // }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
   // Returns the current run time
   function getCurrentRunTime(startTime, currentTime = undefined) {
     if (currentTime === undefined) {
@@ -252,9 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     browser.storage.local.get(
       [
-        'friends',
+        'friends'
       ],
-      (response) => {
+      function (response) {
         const friendsArray = response.friends;
         const newFriendsArray = [];
 
@@ -266,10 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         browser.storage.local.set(
           {
-            friends: newFriendsArray,
-          },
+            friends: newFriendsArray
+          }
         );
-      },
+      }
     );
   }
 
@@ -296,10 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function getFriendsEntered() {
     const friendsArray = [];
     Array.from(document.querySelector('#friends').children).forEach(
-      (element) => {
+      function (element) {
         const friend = getFriendNameFromButton(element);
         friendsArray.push(friend);
-      },
+      }
     );
 
     return friendsArray;
@@ -327,9 +327,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         browser.storage.local.get(
           [
-            'friends',
+            'friends'
           ],
-          (response) => {
+          function (response) {
             let friendsArray = [];
             if (response.friends !== undefined) {
               friendsArray = friendsArray.concat(response.friends);
@@ -338,13 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
             friendsArray.push(friendName);
             browser.storage.local.set(
               {
-                friends: friendsArray,
+                friends: friendsArray
               },
-              () => {
+              function () {
                 addFriendButton(id, friendName);
-              },
+              }
             );
-          },
+          }
         );
       } else {
         console.log(`Friend has already been added: ${friendName}`);
@@ -363,17 +363,17 @@ document.addEventListener('DOMContentLoaded', () => {
       'state',
       'startTime',
       'runTime',
-      'windowMinimized',
+      'windowMinimized'
     ],
-    (response) => {
+    function (response) {
       const currentlySearching = response.state === 'search';
       const friendsArray = response.friends;
       if (friendsArray !== undefined) {
         friendsArray.forEach(
-          (friendName) => {
+          function (friendName) {
             const id = `${friendName}-entered`;
             addFriendButton(id, friendName);
-          },
+          }
         );
 
         if (currentlySearching) {
@@ -410,18 +410,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.friendsFound !== undefined && response.friendsFound.length > 0) {
         foundFriend(response.friendsFound);
       }
-    },
+    }
   );
 
   // Check for enter press on friend input
   $('#friend-input').keypress(
-    (event) => {
+    function (event) {
       const keycode = (event.keyCode ? event.keyCode : event.which);
       if (keycode === '13') {
         console.log('Enter was pressed on input');
         addFriend();
       }
-    },
+    }
   );
 
   // Listen for button that adds a friend
@@ -430,15 +430,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Listen for minimized toggle
   $('#minimized-toggle').bind(
     'click',
-    () => {
+    function () {
       const checked = $('#minimized-toggle').is(':checked');
       console.log(`Setting windowMinimized to ${checked}`);
       browser.storage.local.set(
         {
-          windowMinimized: checked,
-        },
+          windowMinimized: checked
+        }
       );
-    },
+    }
   );
 
   // Steps to take when a new game needs to be joined
@@ -446,8 +446,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create port to send messages to background
     const backgroundPort = browser.runtime.connect(
       {
-        name: 'p2b',
-      },
+        name: 'p2b'
+      }
     );
 
     console.log('Sending join new game message');
@@ -455,15 +455,15 @@ document.addEventListener('DOMContentLoaded', () => {
       {
         windowId,
         tabId,
-        task: 'joinNewGame',
-      },
+        task: 'joinNewGame'
+      }
     );
   }
 
   // Listen for button that starts search
   $('#start-button').bind(
     'click',
-    () => {
+    function () {
       this.blur();
       console.log('User wants to start search');
 
@@ -486,9 +486,9 @@ document.addEventListener('DOMContentLoaded', () => {
             endTime: -1,
             runTime: -1,
             playersFound: [],
-            friendsFound: [],
+            friendsFound: []
           },
-          () => {
+          function () {
             $('#friend-error').hide();
             updateDisabledPropOfForm(true);
 
@@ -498,9 +498,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             browser.storage.local.get(
               [
-                'totalTimesSearched',
+                'totalTimesSearched'
               ],
-              (response) => {
+              function (response) {
                 let newTotalTimesSearched = 1;
 
                 if (response.totalTimesSearched !== undefined) {
@@ -509,10 +509,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 browser.storage.local.set(
                   {
-                    totalTimesSearched: newTotalTimesSearched,
-                  },
+                    totalTimesSearched: newTotalTimesSearched
+                  }
                 );
-              },
+              }
             );
 
             const windowSettings = {};
@@ -524,29 +524,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             browser.windows.create(
               windowSettings,
-              (window) => {
+              function (window) {
                 const currentTime = new Date().getTime();
                 browser.storage.local.set(
                   {
                     windowId: window.id,
-                    startTime: currentTime,
+                    startTime: currentTime
                   },
-                  () => {
+                  function () {
                     joinNewGame(window.id, window.tabs[0].id);
-                  },
+                  }
                 );
-              },
+              }
             );
-          },
+          }
         );
       }
-    },
+    }
   );
 
   // Listen for button that pauses search
   $('#pause-button').bind(
     'click',
-    () => {
+    function () {
       console.log('Pausing search');
 
       this.blur();
@@ -554,43 +554,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
       browser.storage.local.set(
         {
-          state: 'pause',
+          state: 'pause'
         },
-        () => {
+        function () {
           updateDisabledPropOfForm(false, true);
 
           browser.storage.local.get(
             [
-              'startTime',
+              'startTime'
             ],
-            (response) => {
+            function (response) {
               const currentTime = new Date().getTime();
               browser.storage.local.set(
                 {
                   endTime: currentTime,
-                  runTime: getCurrentRunTime(response.startTime, currentTime),
-                },
+                  runTime: getCurrentRunTime(response.startTime, currentTime)
+                }
               );
-            },
+            }
           );
-        },
+        }
       );
-    },
+    }
   );
 
   // Listen for button that resumes search
   $('#resume-button').bind(
     'click',
-    () => {
+    function () {
       console.log('Resuming search');
 
       this.blur();
       updatePopupAndBadge('search');
       browser.storage.local.set(
         {
-          state: 'search',
+          state: 'search'
         },
-        () => {
+        function () {
           updateDisabledPropOfForm(true);
 
           $('#character-error').hide();
@@ -603,40 +603,40 @@ document.addEventListener('DOMContentLoaded', () => {
           } else {
             browser.storage.local.set(
               {
-                friends: friendsArray,
+                friends: friendsArray
               },
-              () => {
+              function () {
                 $('#friend-error').hide();
 
                 browser.storage.local.get(
                   [
-                    'windowId',
+                    'windowId'
                   ],
-                  (response) => {
+                  function (response) {
                     browser.windows.get(
                       response.windowId,
                       {
-                        populate: true,
+                        populate: true
                       },
-                      (window) => {
+                      function (window) {
                         const tabId = window.tabs[0].id;
                         joinNewGame(window.id, tabId);
-                      },
+                      }
                     );
-                  },
+                  }
                 );
-              },
+              }
             );
           }
-        },
+        }
       );
-    },
+    }
   );
 
   // Listen for button that stops search
   $('#stop-button').bind(
     'click',
-    () => {
+    function () {
       console.log('Stopping search');
 
       this.blur();
@@ -645,19 +645,19 @@ document.addEventListener('DOMContentLoaded', () => {
         [
           'state',
           'startTime',
-          'windowId',
+          'windowId'
         ],
-        (response) => {
+        function (response) {
           browser.storage.local.set(
             {
-              state: 'stop',
+              state: 'stop'
             },
-            () => {
+            function () {
               searchIsStopped();
 
               const currentTime = new Date().getTime();
               const storageUpdate = {
-                endTime: currentTime,
+                endTime: currentTime
               };
               if (response.state !== 'pause') {
                 console.log('Updating runTime');
@@ -668,10 +668,10 @@ document.addEventListener('DOMContentLoaded', () => {
               browser.storage.local.set(storageUpdate);
 
               browser.windows.remove(response.windowId);
-            },
+            }
           );
-        },
+        }
       );
-    },
+    }
   );
 }, false);

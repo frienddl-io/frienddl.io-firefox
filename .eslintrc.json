@@ -13,6 +13,9 @@
         "ecmaVersion": 11
     },
     "rules": {
-        "no-console": ["error", { "allow": ["log", "warn", "error", "dir"] }]
+        "no-console": ["error", { "allow": ["log", "warn", "error", "dir"] }],
+        "comma-dangle": ["error", "never"],
+        "func-names": ["error", "never"],
+        "prefer-arrow-callback": "off"
     }
 }

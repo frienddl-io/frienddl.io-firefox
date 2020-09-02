@@ -14,14 +14,14 @@ const CONTENT_PORTS = [];
 // Updates a tab to go to the skribbl.io home page
 function goToSkribblioHomePageAsync(tabId) {
   return new Promise(
-    (resolve) => {
+    function (resolve) {
       browser.tabs.update(
         tabId,
         {
           url: SKRIBBLIO_URL,
-          active: false,
+          active: false
         },
-        async (tab) => {
+        async function (tab) {
           browser.tabs.onUpdated.addListener(
             function listener(listenerTabId, info) {
               if (info.status === 'complete' && listenerTabId === tab.id) {
@@ -30,11 +30,11 @@ function goToSkribblioHomePageAsync(tabId) {
               } else {
                 console.log(`Not ready | info.status: ${info.status} , Target Tab: ${listenerTabId} , Current Tab: ${tab.id}`);
               }
-            },
+            }
           );
-        },
+        }
       );
-    },
+    }
   );
 }
 
@@ -43,20 +43,20 @@ function updatePlayersFound(playersArray) {
   browser.storage.local.get(
     [
       'playersFound',
-      'totalPlayersSeen',
+      'totalPlayersSeen'
     ],
-    (response) => {
+    function (response) {
       const playersFound = [response.playersFound];
       if (playersFound !== undefined) {
         console.dir(playersFound);
       }
       const newPlayersFound = [];
       playersArray.forEach(
-        (element) => {
+        function (element) {
           if (playersFound.indexOf(element) === -1) {
             newPlayersFound.push(element);
           }
-        },
+        }
       );
 
       const totalPlayersFound = newPlayersFound.concat(playersFound);
@@ -69,10 +69,10 @@ function updatePlayersFound(playersArray) {
       browser.storage.local.set(
         {
           playersFound: totalPlayersFound,
-          totalPlayersSeen: newTotalPlayersSeen,
-        },
+          totalPlayersSeen: newTotalPlayersSeen
+        }
       );
-    },
+    }
   );
 }
 
@@ -83,15 +83,15 @@ function updateStorage() {
       'gamesJoined',
       'startTime',
       'runTime',
-      'totalGamesJoined',
+      'totalGamesJoined'
     ],
-    (response) => {
+    function (response) {
       console.dir(response);
       const newGamesJoined = response.gamesJoined + 1;
       browser.browserAction.setBadgeText(
         {
-          text: newGamesJoined.toString(),
-        },
+          text: newGamesJoined.toString()
+        }
       );
 
       const startTime = [response.startTime];
@@ -106,10 +106,10 @@ function updateStorage() {
         {
           gamesJoined: newGamesJoined,
           totalGamesJoined: newTotalGamesJoined,
-          runTime: newRunTime,
-        },
+          runTime: newRunTime
+        }
       );
-    },
+    }
   );
 }
 
@@ -128,20 +128,20 @@ function updateBadge(state) {
     case 'stop':
       browser.browserAction.setBadgeBackgroundColor(
         {
-          color: STOP_BADGE_COLOR,
-        },
+          color: STOP_BADGE_COLOR
+        }
       );
       break;
     case 'success':
       browser.browserAction.setBadgeText(
         {
-          text: SUCCESS_BADGE_TEXT,
-        },
+          text: SUCCESS_BADGE_TEXT
+        }
       );
       browser.browserAction.setBadgeBackgroundColor(
         {
-          color: SUCCESS_BADGE_COLOR,
-        },
+          color: SUCCESS_BADGE_COLOR
+        }
       );
       break;
     default:
@@ -154,9 +154,9 @@ function foundFriend(friendsArray) {
   console.log('Found friend');
   browser.storage.local.set(
     {
-      state: 'stop',
+      state: 'stop'
     },
-    () => {
+    function () {
       updateBadge('success');
 
       browser.storage.local.get(
@@ -165,9 +165,9 @@ function foundFriend(friendsArray) {
           'runTime',
           'totalFriendsFound',
           'totalRunTime',
-          'windowId',
+          'windowId'
         ],
-        (response) => {
+        function (response) {
           const currentTime = new Date().getTime();
           const finalRunTime = getCurrentRunTime(response.startTime, currentTime);
 
@@ -187,24 +187,24 @@ function foundFriend(friendsArray) {
               runTime: finalRunTime,
               endTime: currentTime,
               totalFriendsFound: newTotalFriendsFound,
-              totalRunTime: newTotalRunTime,
-            },
+              totalRunTime: newTotalRunTime
+            }
           );
 
           browser.windows.update(
             response.windowId,
             {
-              drawAttention: true,
-            },
+              drawAttention: true
+            }
           );
 
           const language = browser.i18n.getUILanguage().split('-')[0];
           console.log(`Using language: ${language}`);
           const audio = new Audio(`../_locales/${language}/success.mp3`);
           audio.play();
-        },
+        }
       );
-    },
+    }
   );
 }
 
@@ -217,30 +217,30 @@ function joinNewGame(newGameTabId) {
 
       console.log('Waiting for content script to load');
       const checkIfContentScriptIsLoaded = setInterval(
-        () => {
+        function () {
           if (CONTENT_PORTS.includes(newGameTabId)) {
             console.log('Loaded');
 
             browser.storage.local.get(
               [
-                'state',
+                'state'
               ],
-              (response) => {
+              function (response) {
                 if (response.state === 'search') {
                   console.log('Sending message to join new game');
                   browser.tabs.sendMessage(
                     newGameTabId,
                     {
                       tabId: newGameTabId,
-                      task: 'retrieveContent',
+                      task: 'retrieveContent'
                     },
                     // eslint-disable-next-line no-use-before-define
-                    respondToContent,
+                    respondToContent
                   );
                 } else {
                   console.log(`State is not search: ${response.state}`);
                 }
-              },
+              }
             );
             clearInterval(checkIfContentScriptIsLoaded);
           } else {
@@ -249,7 +249,7 @@ function joinNewGame(newGameTabId) {
             console.log(CONTENT_PORTS.includes(newGameTabId));
           }
         },
-        100,
+        100
       );
     }
   )();
@@ -275,16 +275,16 @@ function respondToContent(response) {
       browser.storage.local.get(
         [
           'friends',
-          'state',
+          'state'
         ],
-        (getResponse) => {
+        function (getResponse) {
           const friendsFound = [];
           getResponse.friends.forEach(
-            (friend) => {
+            function (friend) {
               if (playersArray.includes(friend)) {
                 friendsFound.push(friend);
               }
-            },
+            }
           );
 
           if (friendsFound.length === 0) {
@@ -295,7 +295,7 @@ function respondToContent(response) {
           } else {
             foundFriend(friendsFound, response.tabId);
           }
-        },
+        }
       );
     } else {
       console.log('Only 1 players was found');
@@ -306,25 +306,27 @@ function respondToContent(response) {
 
 // Listen for messages from popup
 browser.runtime.onConnect.addListener(
-  (port) => {
+  function (port) {
     if (port.name === 'p2b') {
       console.log('Connected to p2b');
       port.onMessage.addListener(
-        (message) => {
+        function (message) {
           console.dir(message);
 
           if (message.task === 'joinNewGame') {
             joinNewGame(message.tabId);
           }
-        },
+        }
       );
     } if (port.name === 'c2b') {
       const tabId = port.sender.tab.id;
       CONTENT_PORTS.push(tabId);
     } else {
       console.log(`Port is not recognized: ${port.name}`);
+      // debugger;
+      console.log(`port.name === 'p2b' : ${port.name === 'p2b'}`);
     }
-  },
+  }
 );
 
 function stopSearch() {
@@ -332,12 +334,12 @@ function stopSearch() {
   browser.storage.local.get(
     [
       'startTime',
-      'state',
+      'state'
     ],
-    (response) => {
+    function (response) {
       if (response.state !== 'stop') {
         const storageUpdate = {
-          state: 'stop',
+          state: 'stop'
         };
 
         if (response.state !== 'pause') {
@@ -351,22 +353,22 @@ function stopSearch() {
         }
         browser.storage.local.set(storageUpdate);
       }
-    },
+    }
   );
 }
 
 // Listen for window to close
 browser.windows.onRemoved.addListener(
-  (windowId) => {
+  function (windowId) {
     browser.storage.local.get(
       [
-        'windowId',
+        'windowId'
       ],
-      (response) => {
+      function (response) {
         if (windowId === response.windowId) {
           stopSearch();
         }
-      },
+      }
     );
-  },
+  }
 );

@@ -3,8 +3,8 @@ console.log('frienddl.io content script loaded');
 console.log('Setting up port');
 browser.runtime.connect(
   {
-    name: 'c2b',
-  },
+    name: 'c2b'
+  }
 );
 
 function checkDisconnected() {
@@ -25,13 +25,13 @@ function receiveRequest(request, sender, sendResponse) {
 
   browser.storage.local.get(
     [
-      'state',
+      'state'
     ],
-    (response) => {
+    function (response) {
       if (response.state === 'search') {
         console.log('Waiting for play button');
         const checkIfPlayButtonExists = setInterval(
-          () => {
+          function () {
             if ($('button[type="submit"]').length >= 2) {
               console.log('Play button exists, clicking now');
 
@@ -43,19 +43,19 @@ function receiveRequest(request, sender, sendResponse) {
               console.log('Play button doesn\'t exist');
             }
           },
-          100,
+          100
         );
 
         console.log('Waiting for players');
         const checkIfPlayersExist = setInterval(
-          () => {
+          function () {
             const disconnected = checkDisconnected();
             if (disconnected) {
               sendResponse(
                 {
                   players: [],
-                  tabId: request.tabId,
-                },
+                  tabId: request.tabId
+                }
               );
             }
 
@@ -64,12 +64,12 @@ function receiveRequest(request, sender, sendResponse) {
 
               const playersArray = [];
               $('.player').each(
-                () => {
+                function () {
                   const playerName = $(this).find('.name').html();
                   if (playerName !== null && playerName !== '' && !(playersArray.includes(playerName))) {
                     playersArray.push(playerName);
                   }
-                },
+                }
               );
 
               clearInterval(checkIfPlayersExist);
@@ -77,17 +77,17 @@ function receiveRequest(request, sender, sendResponse) {
               sendResponse(
                 {
                   players: playersArray,
-                  tabId: request.tabId,
-                },
+                  tabId: request.tabId
+                }
               );
             } else {
               console.log('Players don\'t exist');
             }
           },
-          100,
+          100
         );
       }
-    },
+    }
   );
 
   return true;
