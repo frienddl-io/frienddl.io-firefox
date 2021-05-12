@@ -366,7 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.classList.add("friend-button");
     btn.classList.add("enabled-friend-button");
 
-    btn.innerHTML = friendName + " <span aria-hidden='true'>&times;</span>";
+    btn.innerText = friendName + " <span aria-hidden='true'>&times;</span>";
     btn.onclick = removeFriend;
 
     console.log(`Adding friend button: ${friendName}`);
